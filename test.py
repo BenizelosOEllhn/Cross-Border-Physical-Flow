@@ -14,7 +14,6 @@ def open_login_page(url):
     driver.get(url)
     return driver
 
-
 def login(driver, username, password):
     # Close pop-up and open login form
     close_button = driver.find_element('id', 'close-button')
@@ -30,6 +29,13 @@ def login(driver, username, password):
     password_input.send_keys(password)
     submit_button.click()
 
+def choose():
+    answer = input("\nDo you want the whole year or a specific date?(For whole year press enter for date write the date like(day.month.year) 03.05.2023)")
+    if answer == "":
+        return 0
+    else: 
+        return answer
+        
 
 def get_country(driver, number):
     checkbox = driver.find_element(By.XPATH, f'//input[@id="{number}"]')
@@ -50,13 +56,19 @@ def download_file(driver, url):
 
     # Select the desired country and open the download dropdown
     get_country(driver, number)
-    dropdown = driver.find_element('id', 'dv-export-data')
-    dropdown.click()
-    # Wait for download link to be available and get download link URL
-    link_element = driver.find_element(By.XPATH, '//a[@dataitem="ALL" and @timerange="YEAR" and @exporttype="CSV"]')
-    hover = ActionChains(driver).move_to_element(link_element)
-    hover.perform()
-    link_element.click()
+    choice = choose()
+    #If you want whole year 
+    if choice == 0:
+        dropdown = driver.find_element('id', 'dv-export-data')
+        dropdown.click()
+        # Wait for download link to be available and get download link URL
+        link_element = driver.find_element(By.XPATH, '//a[@dataitem="ALL" and @timerange="YEAR" and @exporttype="CSV"]')
+        hover = ActionChains(driver).move_to_element(link_element)
+        hover.perform()
+        link_element.click()
+    #For specific date
+    else:
+        
 
 
 def close_driver(driver):
@@ -67,6 +79,7 @@ def close_driver(driver):
 def main():
     driver = open_login_page(URL)
     login(driver, username, password)
+    
     download_file(driver, URL)
     time.sleep(20)
     close_driver(driver)
