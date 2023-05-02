@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
 from selenium.webdriver.common.action_chains import ActionChains
+import datetime
 
 
 URL = 'https://transparency.entsoe.eu/transmission-domain/physicalFlow/show#'
@@ -35,7 +36,14 @@ def choose():
         return 0
     else: 
         return answer
-        
+
+def get_date(driver, requested_date):
+    date_time = datetime.datetime.now() #gets current datetime
+    current_date = date_time.strftime("%d.%m.%Y") #formats current datetime (DD.MM.YYYY)
+    link_element = driver.find_element(By.XPATH, '//a[@dataitem="ALL" and @timerange="YEAR" and @exporttype="CSV"]')
+    download_url = link_element.get_attribute("href")
+    new = download_url.replace(f"{current_date}",f"{requested_date}")
+    driver.get(new)
 
 def get_country(driver, number):
     checkbox = driver.find_element(By.XPATH, f'//input[@id="{number}"]')
@@ -56,9 +64,9 @@ def download_file(driver, url):
 
     # Select the desired country and open the download dropdown
     get_country(driver, number)
-    choice = choose()
+    answer = choose()
     #If you want whole year 
-    if choice == 0:
+    if answer == 0:       
         dropdown = driver.find_element('id', 'dv-export-data')
         dropdown.click()
         # Wait for download link to be available and get download link URL
@@ -68,7 +76,14 @@ def download_file(driver, url):
         link_element.click()
     #For specific date
     else:
-        
+        get_date(driver, answer)
+        dropdown = driver.find_element('id', 'dv-export-data')
+        dropdown.click()
+        # Wait for download link to be available and get download link URL
+        link_element = driver.find_element(By.XPATH, '//a[@dataitem="ALL" and @timerange="DEFAULT" and @exporttype="CSV"]')
+        hover = ActionChains(driver).move_to_element(link_element)
+        hover.perform()
+        link_element.click()
 
 
 def close_driver(driver):
