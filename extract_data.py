@@ -9,8 +9,20 @@ username = 'panospanopoulos5@gmail.com'
 password = 'confirmpassword!'
 
 def open_login_page(url):
+    # Set the path to the directory where the running file is located
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Configure Selenium to use the desired download directory
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_experimental_option('prefs', {
+        'download.default_directory': current_dir,
+        'download.prompt_for_download': False,
+        'download.directory_upgrade': True,
+        'safebrowsing.enabled': True
+    })
+    
     # Create webdriver object and open login page
-    driver = webdriver.Chrome()
+    driver = webdriver.Chrome(options=chrome_options)
     driver.get(url)
     return driver
 
