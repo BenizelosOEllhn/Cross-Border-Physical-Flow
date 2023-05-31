@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 import time
 from selenium.webdriver.common.action_chains import ActionChains
 import datetime
+import os
 
 URL = 'https://transparency.entsoe.eu/transmission-domain/physicalFlow/show#'
 username = 'panospanopoulos5@gmail.com'
