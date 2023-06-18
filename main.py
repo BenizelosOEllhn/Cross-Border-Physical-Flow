@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 import csv
 import re
 import numpy as np
-import matplotlib
 
 URL = 'https://transparency.entsoe.eu/transmission-domain/physicalFlow/show#'
 username = 'panospanopoulos5@gmail.com'
@@ -83,6 +82,9 @@ class Controller:
         self.page.update()
 
     def submit(self, e):
+        
+        prefixes_to_delete = ["csv", "graph"]
+        delete_files_starting_with(prefixes_to_delete)
 
         driver = open_login_page(URL)
         login(driver, username, password)
@@ -111,8 +113,8 @@ class Controller:
                 self.help.append(
                     ft.Image(
                         src=f"{sanitize_filename(output_file)}.png",
-                        width=900,
-                        height=700,
+                        width=750,
+                        height=500,
                         fit=ft.ImageFit.FILL,
                         border_radius=ft.border_radius.all(10)
                     )
@@ -125,7 +127,7 @@ class Controller:
         
         self.page.update()
 
-    def reset(self, e):
+    def reset(self):
         self.page.controls = []
         self.build()
         self.page.update()
@@ -181,6 +183,7 @@ def get_country(driver, number):
     country = parent_element.find_element(By.XPATH, './/a[@href]')
     hover = ActionChains(driver).move_to_element(country)
     hover.perform()
+    time.sleep(1)
     country.click()
 
 
@@ -285,6 +288,16 @@ def no_spaces(filename):
     modified_name = modified_name.replace('[', '(').replace(']', ')')
     return modified_name
 
+def delete_files_starting_with(prefixes):
+    current_directory = os.getcwd()
+    files_in_directory = os.listdir(current_directory)
+
+    for file_name in files_in_directory:
+        for prefix in prefixes:
+            if file_name.startswith(prefix):
+                file_path = os.path.join(current_directory, file_name)
+                os.remove(file_path)
+                print(f"Deleted file: {file_path}")
 
 def plot_graph(csv_file, output_file, y1_label, y2_label):
     plt.clf()
@@ -308,12 +321,37 @@ def plot_graph(csv_file, output_file, y1_label, y2_label):
     # Set the width of the bars and the gap between them
     bar_width = 0.75
     gap_width = 0.25
-
+    
+    mean_imp = np.mean(y1)
+    mean_exp = np.mean(y2)
+    meanimp = f"Mean of imports:{mean_imp:.2f}"
+    meanexp= f"Mean of exports:{mean_exp:.2f}"
+    max_imported_value = np.max(y1)
+    min_imported_value = np.min(y1)
+    max_y2_value = np.max(y2)
+    min_y2_value = np.min(y2)
+    max1 = f"Max imported:{max_imported_value:.2f}"
+    min2 =  f"Min imported:{min_imported_value:.2f}"
+    max11 = f"Min exported:{max_y2_value:.2f}"
+    min22 =  f"Max exported:{min_y2_value:.2f}"
+    sum_y1 = sum(y1)
+    sum_y2 = sum(y2)
+    sum_y1_label = f"Imported sum: {sum_y1}"
+    sum_y2_label = f"Exported sum: {sum_y2}"
+    
+    plt.figtext(0.05, 0.95, meanimp, ha='left', va='top', color='black')
+    plt.figtext(0.05, 0.03, meanexp, ha='left', va='bottom', color='black')
+    plt.figtext(0.5, 0.95, max1, ha='center', va='top', color='black')
+    plt.figtext(0.5, 0.03, min2, ha='center', va='bottom', color='black')
+    plt.figtext(0.75, 0.95, max11, ha='left', va='top', color='black')
+    plt.figtext(0.75, 0.03, min22, ha='left', va='bottom', color='black')
+    plt.text(0.95, 0.5, sum_y1_label, ha='right', va='center', transform=plt.gca().transAxes, color='black')
+    plt.text(0.95, 0.45, sum_y2_label, ha='right', va='center', transform=plt.gca().transAxes, color='black')
+       
     # Shift the x positions for the bars to create gaps between them
     x1 = np.array(x) - (bar_width + gap_width) / 2
     x2 = np.array(x) + (bar_width + gap_width) / 2
     plt.bar(x1, y1, width=bar_width, color='orange', label=y1_label)
-    plt.bar()
     plt.bar(x2, y2, width=bar_width, color='purple', label=y2_label)
     plt.xlabel('Hour')
     plt.ylabel('Value')
@@ -322,26 +360,6 @@ def plot_graph(csv_file, output_file, y1_label, y2_label):
     plt.legend()
     sanitized_output_file = sanitize_filename(output_file)
     plt.savefig(sanitized_output_file)
-
-    # # Statistics
-    y3=-1*y2
-    mean_imp = np.mean(y1)
-    mean_exp = np.mean(y3)
-    imp_variance = np.var(y1)
-    exp_variance = np.var(y3)
-    imp_deviation = np.sqrt(imp_variance)
-    exp_deviation = np.sqrt(exp_variance)
-    max_imported_value = np.max(y1)
-    min_imported_value = np.min(y1)
-    max_y2_value = np.max(y3)
-    min_y2_value = np.min(y3)
-
-    final_imp_list = [mean_imp, imp_deviation,
-                      max_imported_value, min_imported_value]
-    final_exp_list = [mean_exp, exp_deviation,
-                      max_y2_value, min_y2_value]
-    return final_imp_list, final_exp_list
-
 
 def main(page: ft.Page):
     page.title = "Cross Border Physicsl Flows Analysis"
