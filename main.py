@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import csv
 import re
 import numpy as np
+import tempfile
 
 URL = 'https://transparency.entsoe.eu/transmission-domain/physicalFlow/show#'
 username = 'panospanopoulos5@gmail.com'
@@ -72,7 +73,7 @@ class Controller:
         )
 
         self.tb = ft.TextField(
-            label="Date", hint_text="ex. 03.05.2023. For this year leave blank", width=400
+            label="Date", hint_text="eg. 03.05.2023. For year write eg.2022:", width=400
         )
         self.help = [self.t, self.dd, self.tb, self.b]
         self.page.scroll='always'
@@ -82,7 +83,6 @@ class Controller:
         self.page.update()
 
     def submit(self, e):
-        
         prefixes_to_delete = ["csv", "graph"]
         delete_files_starting_with(prefixes_to_delete)
 
@@ -91,14 +91,19 @@ class Controller:
         download_file(driver, URL, self.dd.value.split(":")[0], self.tb.value)
         close_driver(driver)
 
-        folder_path = os.getcwd()
+        temp_dir = tempfile.gettempdir()
         # Get all files in the current working directory
-        files = os.listdir(folder_path)
+        file_prefix = "Cross"
+        found_files = []
+        for root, dirs, files in os.walk(temp_dir):
+            for file_name in files:
+                if file_name.startswith(file_prefix):
+                    file_path = os.path.join(root, file_name)
+                    found_files.append(file_path)
         # Search for files that start with "Cross"
-        matching_files = [file for file in files if file.startswith("Cross")]
         names = []
         i = 0
-        for csv_file in matching_files:
+        for csv_file in found_files:
             print(csv_file)
             output_file = 'graph.png'
             with open(csv_file, 'r') as file:
@@ -120,7 +125,7 @@ class Controller:
                     )
                 )
 
-        for csv_file in matching_files:
+        for csv_file in found_files:
             os.rename(csv_file, no_spaces(names[i]))
             i = i + 1
 
@@ -241,19 +246,133 @@ def download_file(driver, url, countryselector, date):
         bdz_link.click()
         dropdown = driver.find_element('id', 'dv-export-data')
         dropdown.click()
-        if answer == '':
+           
+        if answer == '2023':
             if flag == True:
                 dropdown = driver.find_element('id', 'dv-export-data')
                 dropdown.click()
-            time.sleep(4)
             link_element = driver.find_element(
                 By.XPATH, '//a[@dataitem="ALL" and @timerange="YEAR" and @exporttype="CSV"]')
             hover = ActionChains(driver).move_to_element(link_element)
             hover.perform()
             link_element.click()
-            time.sleep(4)
+            time.sleep(6)
             flag = True
-        else:
+            
+        if answer == '2022':
+            if first_time == True:
+                get_date(driver, '30.12.2022')
+            dropdown = driver.find_element('id', 'dv-export-data')
+            dropdown.click()
+            link_element = driver.find_element(
+                By.XPATH, '//a[@dataitem="ALL" and @timerange="YEAR" and @exporttype="CSV"]')
+            first_time = False
+            time.sleep(1)
+            hover = ActionChains(driver).move_to_element(link_element)
+            hover.perform()
+            link_element.click()
+            time.sleep(6)
+            
+        if answer == '2021':
+            if first_time == True:
+                get_date(driver, '30.12.2021')
+            dropdown = driver.find_element('id', 'dv-export-data')
+            dropdown.click()
+            link_element = driver.find_element(
+                By.XPATH, '//a[@dataitem="ALL" and @timerange="YEAR" and @exporttype="CSV"]')
+            first_time = False
+            time.sleep(1)
+            hover = ActionChains(driver).move_to_element(link_element)
+            hover.perform()
+            link_element.click()
+            time.sleep(6)
+        
+        if answer == '2020':
+            if first_time == True:
+                get_date(driver, '30.12.2020')
+            dropdown = driver.find_element('id', 'dv-export-data')
+            dropdown.click()
+            link_element = driver.find_element(
+                By.XPATH, '//a[@dataitem="ALL" and @timerange="YEAR" and @exporttype="CSV"]')
+            first_time = False
+            time.sleep(1)
+            hover = ActionChains(driver).move_to_element(link_element)
+            hover.perform()
+            link_element.click()
+            time.sleep(6)
+        
+        if answer == '2019':
+            if first_time == True:
+                get_date(driver, '30.12.2019')
+            dropdown = driver.find_element('id', 'dv-export-data')
+            dropdown.click()
+            link_element = driver.find_element(
+                By.XPATH, '//a[@dataitem="ALL" and @timerange="YEAR" and @exporttype="CSV"]')
+            first_time = False
+            time.sleep(1)
+            hover = ActionChains(driver).move_to_element(link_element)
+            hover.perform()
+            link_element.click()
+            time.sleep(6)
+            
+        if answer == '2018':
+            if first_time == True:
+                get_date(driver, '30.12.2018')
+            dropdown = driver.find_element('id', 'dv-export-data')
+            dropdown.click()
+            link_element = driver.find_element(
+                By.XPATH, '//a[@dataitem="ALL" and @timerange="YEAR" and @exporttype="CSV"]')
+            first_time = False
+            time.sleep(1)
+            hover = ActionChains(driver).move_to_element(link_element)
+            hover.perform()
+            link_element.click()
+            time.sleep(6)
+            
+        if answer == '2017':
+            if first_time == True:
+                get_date(driver, '30.12.2017')
+            dropdown = driver.find_element('id', 'dv-export-data')
+            dropdown.click()
+            link_element = driver.find_element(
+                By.XPATH, '//a[@dataitem="ALL" and @timerange="YEAR" and @exporttype="CSV"]')
+            first_time = False
+            time.sleep(1)
+            hover = ActionChains(driver).move_to_element(link_element)
+            hover.perform()
+            link_element.click()
+            time.sleep(6)
+        
+        if answer == '2016':
+            if first_time == True:
+                get_date(driver, '30.12.2016')
+            dropdown = driver.find_element('id', 'dv-export-data')
+            dropdown.click()
+            link_element = driver.find_element(
+                By.XPATH, '//a[@dataitem="ALL" and @timerange="YEAR" and @exporttype="CSV"]')
+            first_time = False
+            time.sleep(1)
+            hover = ActionChains(driver).move_to_element(link_element)
+            hover.perform()
+            link_element.click()
+            time.sleep(6)
+            
+            
+        if answer == '2015':
+            if first_time == True:
+                get_date(driver, '30.12.2015')
+            dropdown = driver.find_element('id', 'dv-export-data')
+            dropdown.click()
+            link_element = driver.find_element(
+                By.XPATH, '//a[@dataitem="ALL" and @timerange="YEAR" and @exporttype="CSV"]')
+            first_time = False
+            time.sleep(1)
+            hover = ActionChains(driver).move_to_element(link_element)
+            hover.perform()
+            link_element.click()
+            time.sleep(6)
+
+        if len(answer) == 10:
             if first_time == True:
                 get_date(driver, answer)
             dropdown = driver.find_element('id', 'dv-export-data')
@@ -326,10 +445,18 @@ def plot_graph(csv_file, output_file, y1_label, y2_label):
     mean_exp = np.mean(y2)
     meanimp = f"Mean of imports:{mean_imp:.2f}"
     meanexp= f"Mean of exports:{mean_exp:.2f}"
-    max_imported_value = np.max(y1)
-    min_imported_value = np.min(y1)
-    max_y2_value = np.max(y2)
-    min_y2_value = np.min(y2)
+    if len(y1) == 0:
+        max_imported_value = 0
+        min_imported_value = 0  
+    else:
+        max_imported_value = np.max(y1)
+        min_imported_value = np.min(y1)
+    if len(y2) == 0:
+        max_y2_value = 0
+        min_y2_value = 0
+    else:
+        max_y2_value = np.max(y2)
+        min_y2_value = np.min(y2)
     max1 = f"Max imported:{max_imported_value:.2f}"
     min2 =  f"Min imported:{min_imported_value:.2f}"
     max11 = f"Min exported:{max_y2_value:.2f}"
@@ -354,7 +481,7 @@ def plot_graph(csv_file, output_file, y1_label, y2_label):
     plt.bar(x1, y1, width=bar_width, color='orange', label=y1_label)
     plt.bar(x2, y2, width=bar_width, color='purple', label=y2_label)
     plt.xlabel('Hour')
-    plt.ylabel('Value')
+    plt.ylabel('MW')
     plt.title('CSV Data Graph')
     plt.grid(True)
     plt.legend()
